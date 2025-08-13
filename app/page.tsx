@@ -58,6 +58,7 @@ export default function Home() {
         createdAt: new Date(),
       })
       setStatus(value)
+      toast.success("Ta réponse a bien été envoyée !")
     } catch (e) {
       console.error(e)
       toast.error("Une erreur est survenue lors de l'envoi de ta réponse, préviens moi !")
@@ -108,7 +109,7 @@ export default function Home() {
           <div className="dialog__title text-xl">
             Seras-tu présent.e ?
           </div>
-          <div className="flex items-center justify-center gap-3 relative" aria-busy={loading}>
+          <div className="flex items-center justify-center gap-3 relative" aria-busy={loading} data-answered={status !== ResponseValue.IDONTKNOW}>
             {
               loading && <Image unoptimized className="absolute" src="/loading.gif" width={50} height={50} alt="Chargement..." />
             }

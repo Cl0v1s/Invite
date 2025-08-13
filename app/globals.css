@@ -57,7 +57,7 @@ button:hover {
   transform: scale(1.1);
 }
 
-button:not([aria-current=true]) {
+[data-answered=true] button:not([aria-current=true]) {
   opacity: 0.3;
 }
 
