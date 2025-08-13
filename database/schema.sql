@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS "response" (
+  id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  friend VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  value TEXT
+);

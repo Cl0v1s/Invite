@@ -1,85 +1,128 @@
 "use client"
+import { getResponses, saveResponse } from "@/services/responses";
+import { ResponseValue } from "@/types/Response";
 import Image from "next/image";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-
-const STATUS = {
-  YES: "yes",
-  NO: "no",
-  MAYBE: "maybe",
-  IDONTKNOW: "CAN YOU REPEAT THE QUESTION",
-} as const
-
-
+import { ToastContainer, toast } from 'react-toastify';
 
 function interpolate(str: string | undefined, vars: Record<string, string | undefined>) {
-  if(!str) return ''
+  if (!str) return ''
   let result = str;
-  Object.keys(vars).forEach((k) => { console.log(k, `\$${k}`, str); result = result.replace(new RegExp(`#${k}`, "g"), vars[k] || '')})
+  Object.keys(vars).forEach((k) => { result = result.replace(new RegExp(`#${k}`, "g"), vars[k] || '') })
   return result
 }
 
 export default function Home() {
+  const lastRequest = useRef<Date | null>(null)
   const param = useRef(new URLSearchParams(global.location?.search || ''))
-  const friend = param.current.get("friend") || 'ami.e'
-  const [status, setStatus] = useState<typeof STATUS[keyof typeof STATUS] >("CAN YOU REPEAT THE QUESTION")
+  const friend = useMemo(() => param.current.get("friend"), [])
+  const [status, setStatus] = useState<typeof ResponseValue[keyof typeof ResponseValue]>("CAN YOU REPEAT THE QUESTION")
+  const [loading, setLoading] = useState(false)
 
   const vars = useMemo(() => ({
-    friend, 
+    friend: friend || "ami.e",
     address: process.env.NEXT_PUBLIC_ADDRESS,
     time: process.env.NEXT_PUBLIC_TIME,
   }), [friend])
 
-  const onYes = useCallback(() => {
+  const fetchStatus = useCallback(async () => {
+    if (!friend) return;
+    setLoading(true);
+    try {
+      const t = new Date()
+      lastRequest.current = t
+      const results = await getResponses({ friend })
+      if (lastRequest.current > t) return;
+      if (results.length === 0) return;
+      setStatus(results[0].value)
+    } catch (e) {
+      console.error(e)
+      toast.error("Une erreur est survenue lors de la récupération de ta réponse, dis-le moi !")
+    } finally {
+      setLoading(false)
+    }
+  }, [friend])
 
-  }, [])
+
+  useEffect(() => {
+    fetchStatus()
+  }, [fetchStatus])
+
+  const answer = useCallback(async (value: typeof ResponseValue[keyof typeof ResponseValue]) => {
+    setLoading(true)
+    try {
+      await saveResponse({
+        friend: friend!,
+        value,
+        createdAt: new Date(),
+      })
+      setStatus(value)
+    } catch (e) {
+      console.error(e)
+      toast.error("Une erreur est survenue lors de l'envoi de ta réponse, préviens moi !")
+    } finally {
+      setLoading(false)
+    }
+
+  }, [friend])
+
+  const onYes = useCallback(() => {
+    answer(ResponseValue.YES)
+  }, [answer])
 
   const onMaybe = useCallback(() => {
-
-  }, [])
+    answer(ResponseValue.MAYBE)
+  }, [answer])
 
   const onNo = useCallback(() => {
-
-  }, [])
+    answer(ResponseValue.NO)
+  }, [answer])
 
   return (
-    <div className="letter">
-      <Image src="/stamp.png" alt="" width={172} height={159} className="absolute right-0 top-[-10px] opacity-50 z-[-1]" />
-      <div className="px-[40px] py-[25px] grow">
-        <h1 className="underline inline-block text-xl mb-3">{ interpolate(process.env.NEXT_PUBLIC_GREETINGS, vars) }</h1>
-        <div>
-          <span className="underline" dangerouslySetInnerHTML={{ __html: interpolate(process.env.NEXT_PUBLIC_P, vars)}} />
-        </div>
-        <div className="mt-3">
-          Au
-          <address>
-            {process.env.NEXT_PUBLIC_ADDRESS}
-          </address>
-          à partir de
-          <time>
-            {process.env.NEXT_PUBLIC_TIME}
-          </time>
-        </div>
-        <div className="text-xl mt-5">
+    <>
+      <div className="letter my-[25px]">
+        <Image src="/stamp.png" alt="" width={172} height={159} className="absolute right-0 top-[-10px] opacity-50 z-[-1]" />
+        <div className="px-[40px] py-[25px] grow">
+          <h1 className="underline inline-block text-xl mb-3">{interpolate(process.env.NEXT_PUBLIC_GREETINGS, vars)}</h1>
+          <div>
+            <span className="underline" dangerouslySetInnerHTML={{ __html: interpolate(process.env.NEXT_PUBLIC_P, vars) }} />
+          </div>
+          <div className="mt-3">
+            Au
+            <a href={`https://www.google.com/maps/place/${encodeURIComponent(process.env.NEXT_PUBLIC_ADDRESS || '')}`} target="_blank">
+              <address>
+                {process.env.NEXT_PUBLIC_ADDRESS}
+              </address>
+            </a>
+            à partir de
+            <time>
+              {process.env.NEXT_PUBLIC_TIME}
+            </time>
+          </div>
+          <div className="text-xl mt-5">
             {process.env.NEXT_PUBLIC_SENDER}
+          </div>
+        </div>
+        <div className="dialog mx-auto sm:ml-auto sm:mr-[-30px] px-[10px] sm:px-[60px] md:px-[60px]">
+          <div className="dialog__title text-xl">
+            Seras-tu présent ?
+          </div>
+          <div className="flex items-center justify-center gap-3 relative" aria-busy={loading}>
+            {
+              loading && <Image unoptimized className="absolute" src="/loading.gif" width={50} height={50} alt="Chargement..." />
+            }
+            <button onClick={onYes} aria-current={status === "yes"} disabled={loading}>
+              <Image src="/yes.png" title="Oui !" alt="Oui !" width={100} height={100} />
+            </button><button onClick={onMaybe} aria-current={status === "maybe"} disabled={loading}>
+              <Image src="/maybe.png" title="Peut être !" alt="Peut être !" width={100} height={100} />
+            </button><button onClick={onNo} aria-current={status === "no"} disabled={loading}>
+              <Image src="/no.png" title="Non ..." alt="Non ..." width={100} height={100} />
+            </button>
+          </div>
         </div>
       </div>
-      <div className="dialog mb-[-50px] ml-auto mr-[-50px]">
-        <div className="dialog__title text-xl">
-          Seras-tu présent ?
-        </div>
-        <div className="flex items-center justify-center gap-3">
-          <button onClick={onYes} aria-current={status === "yes"}>
-            <Image src="/yes.png" title="Oui !" alt="Oui !" width={100} height={100} />
-          </button>
-          <button onClick={onMaybe} aria-current={status === "maybe"}>
-            <Image src="/maybe.png" title="Peut être !" alt="Peut être !" width={100} height={100} />
-          </button>
-          <button onClick={onNo} aria-current={status === "no"}>
-            <Image src="/no.png"  title="Non ..." alt="Non ..." width={100} height={100} />
-          </button>
-        </div>
-      </div>
-    </div>
+      <ToastContainer />
+    </>
   );
 }
