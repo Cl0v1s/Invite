@@ -106,7 +106,7 @@ export default function Home() {
         </div>
         <div className="dialog mx-auto sm:ml-auto sm:mr-[-30px] px-[10px] sm:px-[60px] md:px-[60px]">
           <div className="dialog__title text-xl">
-            Seras-tu présent ?
+            Seras-tu présent.e ?
           </div>
           <div className="flex items-center justify-center gap-3 relative" aria-busy={loading}>
             {

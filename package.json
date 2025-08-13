@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "database": "set -a && source .env && npx ts-node database/init-db.ts"
+    "env": "set -a && source .env",
+    "database": "npx ts-node database/init-db.ts"
   },
   "dependencies": {
     "next": "15.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-toastify": "^11.0.5",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "typescript": "^5",
