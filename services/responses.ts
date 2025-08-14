@@ -4,7 +4,7 @@ import { ready, db } from "@/database/db"
 import { Response } from "@/types/Response"
 
 export async function saveResponse(response: Response) {
-    if(!response.friend || !response.value) throw new Error('Bad request')
+    if(!response.friend || !response.value) throw new Error('Bad request: missing data')
     await ready;
     return new Promise((resolve, reject) => {
         db.run("insert into response(friend, value) values(?, ?)", response.friend, response.value, (err: unknown) => {
