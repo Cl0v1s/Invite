@@ -12,55 +12,57 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export function Datetime({ defaultDate, name }: { defaultDate?: Date, name?: string}) {
+export function Datetime({ defaultDate, name, className, required }: { required?:boolean, className?: string, defaultDate?: Date, name?: string }) {
   const [open, setOpen] = React.useState(false)
   const [date, setDate] = React.useState<Date | undefined>(defaultDate)
 
   return (
-    <>
-        <input name={name} type="hidden" value={date?.toISOString()} />
-        <div className="flex gap-4">
+    <div className={className}>
+      <input name={name} type="hidden" value={date?.toISOString()} />
+      <div className="flex gap-4">
         <div className="flex flex-col">
-            <label htmlFor="date-picker" className="px-1">
+          <label htmlFor="date-picker" className="px-1">
             Date de l&apos;évenement
-            </label>
-            <Popover open={open} onOpenChange={setOpen}>
+          </label>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
+              <Button
                 variant="outline"
                 id="date-picker"
-                className="w-32 justify-between font-normal"
-                >
+                className="justify-between font-normal"
+              >
                 {date ? date.toLocaleDateString() : "Select date"}
                 <ChevronDownIcon />
-                </Button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                <Calendar
+              <Calendar
+                required={required as true}
                 mode="single"
                 selected={date}
                 captionLayout="dropdown"
-                onSelect={(date) => {
-                    setDate(date)
-                    setOpen(false)
+                onSelect={(date: Date) => {
+                  setDate(date)
+                  setOpen(false)
                 }}
-                />
+              />
             </PopoverContent>
-            </Popover>
+          </Popover>
         </div>
         <div className="flex flex-col">
-            <label htmlFor="time-picker" className="px-1">
+          <label htmlFor="time-picker" className="px-1">
             Heure de l&apos;évenement
-            </label>
-            <Input
+          </label>
+          <Input
+            required={required}
             type="time"
             id="time-picker"
             step="1"
             defaultValue="10:30:00"
             className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-            />
+          />
         </div>
-        </div>
-    </>
+      </div>
+    </div>
   )
 }

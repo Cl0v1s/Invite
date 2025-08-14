@@ -8,6 +8,7 @@
   --font-mono: "Adapa";
   --color-primary: #8c7e63;
   --color-secondary: #fbf8cd;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -121,4 +122,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@font-face {
+  font-family: 'Adapa';
+  src: url('/Adapa.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: Adapa, sans-serif;
+  letter-spacing: 1px;
+  color: var(--color-primary)
 }
