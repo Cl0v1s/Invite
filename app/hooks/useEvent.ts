@@ -2,7 +2,6 @@ import { getEvents } from "@/services/events";
 
 export async function getEvent() {
     const events = await getEvents()
-    // TODO: implement event init
-    if(events.length == 0) throw new Error("No event");
+    if(events.length == 0) return undefined
     return events[0]
 }

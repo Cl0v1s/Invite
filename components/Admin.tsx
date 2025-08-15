@@ -11,7 +11,7 @@ import { getResponses } from '@/services/responses';
 import Image from 'next/image';
 
 
-export default function Admin_Client({ event }: { event: Event }) {
+export default function Admin_Client({ event }: { event: Event | undefined }) {
 
     const { data: responses, isLoading: areResponsesLoading } = useQuery({
         queryKey: ["responses-fetch"],
