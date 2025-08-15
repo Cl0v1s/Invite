@@ -17,10 +17,10 @@ export async function saveResponse(response: Response) {
     })
 }
 
-export async function getResponses(request: Pick<Partial<Response>, "friend"> = {}): Promise<Response[]> {
+export async function getResponses(request: Pick<Partial<Response>, "friend" | "value"> = {}): Promise<Response[]> {
     await ready;
-    const ands = Object.keys(request).map((and) => (
-        `${and} = ?`
+    const ands = Object.keys(request).filter((k) => request[k as keyof typeof request] !== undefined).map((and) => (
+        typeof request[and as keyof typeof request] === "string" ? `${and} like ?` : `${and} = ?`
     ))
     const where = ands.length > 0 ? `where ${ands.join(' and ')}` : ''
 
