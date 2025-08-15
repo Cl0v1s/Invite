@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-sans: "Adapa";
-  --font-mono: "Adapa";
+  --font-sans: sans-serif;
+  --font-mono: sans-serif;
   --color-primary: #8c7e63;
   --color-secondary: #fbf8cd;
 
@@ -124,15 +124,6 @@
   }
 }
 
-@font-face {
-  font-family: 'Adapa';
-  src: url('/Adapa.otf');
-  font-weight: normal;
-  font-style: normal;
-}
-
 body {
-  font-family: Adapa, sans-serif;
-  letter-spacing: 1px;
-  color: var(--color-primary)
+  color: var(--color-gray-900)
 }

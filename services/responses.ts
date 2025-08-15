@@ -17,10 +17,15 @@ export async function saveResponse(response: Response) {
     })
 }
 
-export async function getResponses(request: Pick<Response, "friend">): Promise<Response[]> {
+export async function getResponses(request: Pick<Partial<Response>, "friend"> = {}): Promise<Response[]> {
     await ready;
+    const ands = Object.keys(request).map((and) => (
+        `${and} = ?`
+    ))
+    const where = ands.length > 0 ? `where ${ands.join(' and ')}` : ''
+
     return new Promise((resolve, reject) => {
-        db.all("select * from response where friend = ? order by created_at DESC", request.friend, (err: unknown, res: Record<string, string>[]) => {
+        db.all(`select * from response ${where} order by created_at DESC`, ...Object.values(request), (err: unknown, res: Record<string, string>[]) => {
             if(err) reject(err)
             else {
                 resolve(

@@ -8,7 +8,8 @@ export const ResponseValue = {
 
 
 export type Response = {
-    friend: string,
-    createdAt: Date,
-    value: typeof ResponseValue[keyof typeof ResponseValue],
+  id?: string,
+  friend: string,
+  createdAt: Date,
+  value: typeof ResponseValue[keyof typeof ResponseValue],
 }
