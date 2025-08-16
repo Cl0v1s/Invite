@@ -25,7 +25,7 @@ export default function ResponseFilter({ filters, onChange}: { filters: Filters,
                 </label>
                 <label>
                     Type
-                    <Select name="value" defaultValue={filters.value}>
+                    <Select name="value" defaultValue={filters.value || "all"}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue />
                         </SelectTrigger>

@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Event } from '@/types/Event';
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { saveEvent } from '@/services/events';
 import { toast, ToastContainer } from 'react-toastify';
@@ -11,12 +11,28 @@ import ResponseList from '@/components/ResponseList';
 import { useQuery } from '@tanstack/react-query';
 import { getResponses } from '@/services/responses';
 import Image from 'next/image';
+import debounce from 'debounce';
+import ResponseFilter, { Filters } from '@/components/ResponseFilters';
+import { Response } from '@/types/Response';
+import ResponseResume from '@/components/ResponseResume';
 
-function Admin({ event }: { event: Event }) {
+
+function Admin({ event }: { event: Event | undefined }) {
+    const [filters, setFilters] = useState<Filters>({ unique: false, friend: undefined, value: undefined })
+
+    const setFiltersDebounced = useMemo(() => debounce(setFilters, 250), [])
+
     const { data: responses, isLoading: areResponsesLoading } = useQuery({
-        queryKey: ["responses-fetch"],
-        queryFn: () => {
-            return getResponses()
+        queryKey: ["responses-fetch", filters],
+        queryFn: async () => {
+            const res = await getResponses({ friend: filters.friend ? `%${filters.friend}%` : undefined, value: filters.value })
+            if(!filters.unique) return res
+            const dedups = res.reduce((acc, curr) => { // we only get last response for each person since responses are sorted from created_at desc
+                if(acc[curr.friend]) return acc;
+                acc[curr.friend] = curr;
+                return acc
+            }, {} as Record<string, Response>)
+            return Object.values(dedups);
         } 
     })
 
@@ -37,9 +53,19 @@ function Admin({ event }: { event: Event }) {
                 {
                     areResponsesLoading && <Image className='mx-auto' src="/loading.gif" width={30} height={30} aria-busy alt='Chargement...' />
                 }
-                {
-                    responses && <ResponseList responses={responses} />
-                }
+                <div className='flex flex-col gap-3'>
+                    {
+                        responses && (
+                                <ResponseResume responses={responses} />
+                        )
+                    }
+                    <ResponseFilter filters={filters} onChange={setFiltersDebounced} />
+                    {
+                        responses && (
+                                <ResponseList responses={responses} />
+                        )
+                    }
+                </div>
             </div>
             <div className='shrink-0'>
                 <h2 className='text-2xl mb-4'>Edition de l&apos;évenement</h2>
