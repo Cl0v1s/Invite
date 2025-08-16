@@ -78,7 +78,7 @@ function Admin({ event }: { event: Event | undefined }) {
 
 const queryClient = new QueryClient()
 
-export default function Page_Client({ event }: { event: Event }) {
+export default function Page_Client({ event }: { event: Event | undefined }) {
     return (
         <QueryClientProvider client={queryClient}>
             <Admin event={event} />
