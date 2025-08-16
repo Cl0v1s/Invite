@@ -16,6 +16,24 @@ export function Datetime({ defaultDate, name, className, required }: { required?
   const [open, setOpen] = React.useState(false)
   const [date, setDate] = React.useState<Date | undefined>(defaultDate)
 
+  const onDateChange = React.useCallback((n: Date) => {
+    const d = new Date(date!);
+    d.setDate(n.getDate());
+    d.setMonth(n.getMonth())
+    d.setFullYear(n.getFullYear());
+    setDate(d)
+    setOpen(false)
+  }, [date]);
+
+  const onTimeChange: React.ChangeEventHandler<HTMLInputElement> = React.useCallback((e) => {
+    const parts = e.target.value.split(':').map((p) => parseInt(p, 10))
+    const d = new Date(date!)
+    d.setHours(parts[0])
+    d.setMinutes(parts[1])
+    d.setSeconds(parts[2])
+    setDate(d)
+  }, [date])
+
   return (
     <div className={className}>
       <input name={name} type="hidden" value={date?.toISOString()} />
@@ -41,10 +59,7 @@ export function Datetime({ defaultDate, name, className, required }: { required?
                 mode="single"
                 selected={date}
                 captionLayout="dropdown"
-                onSelect={(date: Date) => {
-                  setDate(date)
-                  setOpen(false)
-                }}
+                onSelect={onDateChange}
               />
             </PopoverContent>
           </Popover>
@@ -58,7 +73,9 @@ export function Datetime({ defaultDate, name, className, required }: { required?
             type="time"
             id="time-picker"
             step="1"
-            defaultValue="10:30:00"
+            disabled={!defaultDate}
+            value={date?.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+            onChange={onTimeChange}
             className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
         </div>
