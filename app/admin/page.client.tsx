@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Event } from '@/types/Event';
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { saveEvent } from '@/services/events';
+import { getEvents, saveEvent } from '@/services/events';
 import { toast, ToastContainer } from 'react-toastify';
 import EventForm from '@/components/EventForm';
 import ResponseList from '@/components/ResponseList';
@@ -17,10 +17,18 @@ import { Response } from '@/types/Response';
 import ResponseResume from '@/components/ResponseResume';
 
 
-function Admin({ event }: { event: Event | undefined }) {
+function Admin() {
     const [filters, setFilters] = useState<Filters>({ unique: false, friend: undefined, value: undefined })
 
     const setFiltersDebounced = useMemo(() => debounce(setFilters, 250), [])
+
+    const { data: event } = useQuery({
+        queryKey: ["event-fetch"],
+        queryFn: async () => {
+            const res = await getEvents()
+            return res[0]
+        } 
+    })
 
     const { data: responses, isLoading: areResponsesLoading } = useQuery({
         queryKey: ["responses-fetch", filters],
@@ -78,10 +86,10 @@ function Admin({ event }: { event: Event | undefined }) {
 
 const queryClient = new QueryClient()
 
-export default function Page_Client({ event }: { event: Event | undefined }) {
+export default function Page_Client() {
     return (
         <QueryClientProvider client={queryClient}>
-            <Admin event={event} />
+            <Admin />
         </QueryClientProvider>
     )
 }

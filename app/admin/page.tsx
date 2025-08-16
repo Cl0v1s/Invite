@@ -1,6 +1,4 @@
 import React from "react";
-import { getEvent } from "../hooks/useEvent";
-
 import { Metadata } from "next";
 
 import Page_Client from "./page.client";
@@ -10,9 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Admin_Server() {
-    const event = await getEvent()
-
     return (
-        <Page_Client event={event} />
+        <Page_Client />
     )
 }
