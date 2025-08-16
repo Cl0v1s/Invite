@@ -1,6 +1,5 @@
 "use client" 
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Event } from '@/types/Event';
 import React, { useCallback, useMemo, useState } from 'react'
 
@@ -17,7 +16,7 @@ import { Response } from '@/types/Response';
 import ResponseResume from '@/components/ResponseResume';
 
 
-function Admin() {
+export default function Admin() {
     const [filters, setFilters] = useState<Filters>({ unique: false, friend: undefined, value: undefined })
 
     const setFiltersDebounced = useMemo(() => debounce(setFilters, 250), [])
@@ -81,15 +80,5 @@ function Admin() {
             </div>
             <ToastContainer />
         </div>
-    )
-}
-
-const queryClient = new QueryClient()
-
-export default function Page_Client() {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <Admin />
-        </QueryClientProvider>
     )
 }

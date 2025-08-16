@@ -1,7 +1,8 @@
 "use client"
+import { getEvents } from "@/services/events";
 import { getResponses, saveResponse } from "@/services/responses";
-import { Event } from "@/types/Event";
 import { ResponseValue } from "@/types/Response";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -14,7 +15,15 @@ function interpolate(str: string | undefined, vars: Record<string, string | unde
   return result
 }
 
-export default function Home_Client({ event }: { event: Event }) {
+export default function Page_Client() {
+    const { data: event } = useQuery({
+        queryKey: ["event-fetch"],
+        queryFn: async () => {
+            const res = await getEvents()
+            return res[0]
+        } 
+    })
+
   const lastRequest = useRef<Date | null>(null)
   const param = useRef(new URLSearchParams(global.location?.search || ''))
   const friend = useMemo(() => param.current.get("friend"), [])
@@ -22,14 +31,14 @@ export default function Home_Client({ event }: { event: Event }) {
   const [loading, setLoading] = useState(false)
 
   const time = useMemo(() => {
-    return `${event.datetime.toLocaleTimeString(undefined, { timeStyle: "short" })} le ${event.datetime.toLocaleDateString()}`
+    return `${event?.datetime.toLocaleTimeString(undefined, { timeStyle: "short" })} le ${event?.datetime.toLocaleDateString()}`
   }, [event])
 
   const vars = useMemo(() => ({
     friend: friend || "ami.e",
-    address: event.address,
+    address: event?.address,
     time
-  }), [event.address, friend, time])
+  }), [event?.address, friend, time])
 
   const fetchStatus = useCallback(async () => {
     if (!friend) return;
@@ -90,15 +99,15 @@ export default function Home_Client({ event }: { event: Event }) {
       <div className="letter my-[25px]">
         <Image src="/stamp.png" alt="" width={172} height={159} className="absolute right-0 top-[-10px] opacity-50 z-[-1]" />
         <div className="px-[40px] py-[25px] grow">
-          <h1 className="underline inline-block text-xl mb-3">{interpolate(event.intro, vars)}</h1>
+          <h1 className="underline inline-block text-xl mb-3">{interpolate(event?.intro, vars)}</h1>
           <div>
-            <span className="underline" dangerouslySetInnerHTML={{ __html: interpolate(event.description, vars) }} />
+            <span className="underline" dangerouslySetInnerHTML={{ __html: interpolate(event?.description, vars) }} />
           </div>
           <div className="mt-3">
             Au
-            <a href={`https://www.google.com/maps/place/${encodeURIComponent(event.address || '')}`} target="_blank">
+            <a href={`https://www.google.com/maps/place/${encodeURIComponent(event?.address || '')}`} target="_blank">
               <address>
-                {event.address}
+                {event?.address}
               </address>
             </a>
             à partir de
@@ -107,7 +116,7 @@ export default function Home_Client({ event }: { event: Event }) {
             </time>
           </div>
           <div className="text-xl mt-5">
-            {event.outro}
+            {event?.outro}
           </div>
         </div>
         <div className="dialog mx-auto sm:ml-auto sm:mr-[-30px] px-[10px] sm:px-[60px] md:px-[60px]">

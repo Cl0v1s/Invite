@@ -1,17 +1,10 @@
-import Home_Client from '@/components/Home'
 import React from 'react'
-import { getEvent } from './hooks/useEvent'
 
 import './page.css'
-import { redirect } from 'next/navigation'
+import Page_Client from './page.client'
 
-export default async function Home_Server() {
-    const event = await getEvent()
-    if(!event) {
-        redirect('/admin')
-        return null
-    }
+export default async function Page_Server() {
     return (
-        <Home_Client event={event} />
+        <Page_Client />
     )
 }
