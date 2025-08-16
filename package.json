@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "env": "set -a && source .env",
-    "database": "npx ts-node database/init-db.ts"
+    "database": "npx tsx database/init-db.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -29,7 +29,7 @@
     "react-toastify": "^11.0.5",
     "sqlite3": "^5.1.7",
     "tailwind-merge": "^3.3.1",
-    "ts-node": "^10.9.2"
+    "tsx": "^4.20.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
