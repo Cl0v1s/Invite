@@ -93,7 +93,7 @@ export default function Admin() {
                     </div>
                 </div>
                 {
-                    areResponsesLoading && <Image className='mx-auto' src="/loading.gif" width={30} height={30} aria-busy alt='Chargement...' />
+                    areResponsesLoading && <Image unoptimized className='mx-auto' src="/loading.gif" width={30} height={30} aria-busy alt='Chargement...' />
                 }
             </div>
             <div className='shrink-0 flex flex-col gap-4 p-3'>

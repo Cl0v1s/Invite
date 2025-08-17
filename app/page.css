@@ -6,7 +6,7 @@
   font-style: normal;
 }
 
-body {
+.letter-wrapper {
   font-family: Adapa, sans-serif;
   line-height: 2.2;
   font-size: 16px;
@@ -16,7 +16,7 @@ body {
   color: var(--color-primary)
 }
 
-address, time {
+address.letter__address, time.letter__time {
   display: block;
   background-color: #21afa3c0;
   color: var(--color-secondary);
@@ -33,22 +33,22 @@ address, time {
   text-align: center;
 }
 
-button {
+button.letter__button {
   cursor: pointer;
   transition: transform 0.2s ease;
   transform: scale(1);
 }
 
-[aria-busy=true] > button {
+[aria-busy=true] > button.letter__button {
   opacity: 0 !important;
   cursor: initial;
 }
 
-button:hover {
+button.letter__button:hover {
   transform: scale(1.1);
 }
 
-[data-answered=true] button:not([aria-current=true]) {
+[data-answered=true] button.letter__button:not([aria-current=true]) {
   opacity: 0.3;
 }
 

@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { redirect, RedirectType } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import './page.css'
+
 
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -107,7 +109,7 @@ export default function Page_Client() {
   }
 
   return (
-    <>
+    <div className="letter-wrapper w-full grow flex flex-col items-center justify-center ">
       <div className="letter my-[25px]">
         <Image src="/stamp.png" alt="" width={172} height={159} className="absolute right-0 top-[-10px] opacity-50 z-[-1]" />
         <div className="px-[40px] py-[25px] grow">
@@ -118,12 +120,12 @@ export default function Page_Client() {
           <div className="mt-3">
             Au
             <a href={`https://www.google.com/maps/place/${encodeURIComponent(event?.address || '')}`} target="_blank">
-              <address>
+              <address className="letter__address">
                 {event?.address}
               </address>
             </a>
             à partir de
-            <time>
+            <time className="letter__time">
               {time}
             </time>
           </div>
@@ -141,11 +143,13 @@ export default function Page_Client() {
                 {
                   loading && <Image unoptimized className="absolute" src="/loading.gif" width={50} height={50} alt="Chargement..." />
                 }
-                <button onClick={onYes} aria-current={status === "yes"} disabled={loading}>
+                <button className="letter__button" onClick={onYes} aria-current={status === "yes"} disabled={loading}>
                   <Image src="/yes.png" title="Oui !" alt="Oui !" width={100} height={100} />
-                </button><button onClick={onMaybe} aria-current={status === "maybe"} disabled={loading}>
+                </button>
+                <button className="letter__button" onClick={onMaybe} aria-current={status === "maybe"} disabled={loading}>
                   <Image src="/maybe.png" title="Peut être !" alt="Peut être !" width={100} height={100} />
-                </button><button onClick={onNo} aria-current={status === "no"} disabled={loading}>
+                </button>
+                <button className="letter__button" onClick={onNo} aria-current={status === "no"} disabled={loading}>
                   <Image src="/no.png" title="Non ..." alt="Non ..." width={100} height={100} />
                 </button>
               </div>
@@ -155,6 +159,6 @@ export default function Page_Client() {
 
       </div>
       <ToastContainer />
-    </>
+    </div>
   );
 }
