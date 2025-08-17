@@ -4,6 +4,7 @@ import { getResponses, saveResponse } from "@/services/responses";
 import { ResponseValue } from "@/types/Response";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { redirect, RedirectType } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -16,13 +17,14 @@ function interpolate(str: string | undefined, vars: Record<string, string | unde
 }
 
 export default function Page_Client() {
-    const { data: event } = useQuery({
-        queryKey: ["event-fetch"],
-        queryFn: async () => {
-            const res = await getEvents()
-            return res[0]
-        } 
-    })
+  const { data: event, isLoading: isEventLoading } = useQuery({
+    queryKey: ["event-fetch"],
+    queryFn: async () => {
+      const res = await getEvents()
+      if(res.length == 0) return null
+      return res[0]
+    }
+  })
 
   const lastRequest = useRef<Date | null>(null)
   const param = useRef(new URLSearchParams(global.location?.search || ''))
@@ -94,6 +96,16 @@ export default function Page_Client() {
     answer(ResponseValue.NO)
   }, [answer])
 
+  if(isEventLoading) {
+    return (
+      <Image unoptimized aria-busy src="/loading.gif" width={50} height={50} alt="Chargement..." />
+    )
+  }
+
+  if(!isEventLoading && event === null) {
+    redirect('/admin', RedirectType.replace)
+  }
+
   return (
     <>
       <div className="letter my-[25px]">
@@ -112,30 +124,35 @@ export default function Page_Client() {
             </a>
             à partir de
             <time>
-              { time }
+              {time}
             </time>
           </div>
           <div className="text-xl mt-5">
             {event?.outro}
           </div>
         </div>
-        <div className="dialog mx-auto sm:ml-auto sm:mr-[-30px] px-[10px] sm:px-[60px] md:px-[60px]">
-          <div className="dialog__title text-xl">
-            Seras-tu présent.e ?
-          </div>
-          <div className="flex items-center justify-center gap-3 relative" aria-busy={loading} data-answered={status !== ResponseValue.IDONTKNOW}>
-            {
-              loading && <Image unoptimized className="absolute" src="/loading.gif" width={50} height={50} alt="Chargement..." />
-            }
-            <button onClick={onYes} aria-current={status === "yes"} disabled={loading}>
-              <Image src="/yes.png" title="Oui !" alt="Oui !" width={100} height={100} />
-            </button><button onClick={onMaybe} aria-current={status === "maybe"} disabled={loading}>
-              <Image src="/maybe.png" title="Peut être !" alt="Peut être !" width={100} height={100} />
-            </button><button onClick={onNo} aria-current={status === "no"} disabled={loading}>
-              <Image src="/no.png" title="Non ..." alt="Non ..." width={100} height={100} />
-            </button>
-          </div>
-        </div>
+        {
+          friend && (
+            <div className="dialog mx-auto sm:ml-auto sm:mr-[-30px] px-[10px] sm:px-[60px] md:px-[60px]">
+              <div className="dialog__title text-xl">
+                Seras-tu présent.e ?
+              </div>
+              <div className="flex items-center justify-center gap-3 relative" aria-busy={loading} data-answered={status !== ResponseValue.IDONTKNOW}>
+                {
+                  loading && <Image unoptimized className="absolute" src="/loading.gif" width={50} height={50} alt="Chargement..." />
+                }
+                <button onClick={onYes} aria-current={status === "yes"} disabled={loading}>
+                  <Image src="/yes.png" title="Oui !" alt="Oui !" width={100} height={100} />
+                </button><button onClick={onMaybe} aria-current={status === "maybe"} disabled={loading}>
+                  <Image src="/maybe.png" title="Peut être !" alt="Peut être !" width={100} height={100} />
+                </button><button onClick={onNo} aria-current={status === "no"} disabled={loading}>
+                  <Image src="/no.png" title="Non ..." alt="Non ..." width={100} height={100} />
+                </button>
+              </div>
+            </div>
+          )
+        }
+
       </div>
       <ToastContainer />
     </>

@@ -30,11 +30,11 @@ function ResponseItem({ response }: { response: Response }) {
     )
 }
 
-export default function ResponseList({ responses }: { responses: Response[] }) {
+export default function ResponseList({ responses, className }: { responses: Response[], className?: string }) {
     return (
-        <Table>
-            <TableHeader>
-                <TableRow>
+        <Table className={className}>
+            <TableHeader >
+                <TableRow className='sticky top-0 bg-white shadow-sm' >
                     <TableHead>
                         Nom
                     </TableHead>

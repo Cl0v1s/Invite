@@ -1,6 +1,6 @@
 "use client"
 import { Event } from '@/types/Event';
-import React, { FormEventHandler, useCallback, useState } from 'react'
+import React, { FormEventHandler, useCallback } from 'react'
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,9 +20,7 @@ function Hints() {
     )
 }
 
-export default function EventForm({ event, onSubmit }: { event: Event | undefined, onSubmit: (e: Event) => Promise<void> }) {
-    const [loading, setLoading] = useState(false)
-
+export default function EventForm({ event, onSubmit, className, loading }: { loading?: boolean, event: Event | undefined, onSubmit: (e: Event) => Promise<void>, className?: string  }) {
     const onInternalSubmit: FormEventHandler<HTMLFormElement> = useCallback(async (e) => {
         e.preventDefault();
         const data = new FormData(e.currentTarget)
@@ -36,14 +34,12 @@ export default function EventForm({ event, onSubmit }: { event: Event | undefine
         if(event) {
             newEvent.id = event.id
         }
-        setLoading(true)
-        await onSubmit(newEvent);
-        setLoading(false)
+        onSubmit(newEvent);
     }, [event, onSubmit])
 
     return (
-        <>
-            <form className="flex flex-col gap-5" onSubmit={onInternalSubmit}>
+        <form className={`${className}`} onSubmit={onInternalSubmit}>
+            <fieldset className='flex flex-col gap-5' disabled={loading}>
                 <Hints />
                 <label>
                     Introduction
@@ -67,7 +63,7 @@ export default function EventForm({ event, onSubmit }: { event: Event | undefine
                         Envoyer
                     </Button>
                 </div>
-            </form>
-        </>
+            </fieldset>
+        </form>
     )
 }
