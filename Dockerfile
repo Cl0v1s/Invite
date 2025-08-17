@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
@@ -7,18 +7,18 @@ ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-RUN npm install
+RUN bun install
 
 COPY . .
 
-RUN npm run build
+RUN bun run build
 
-FROM node:20-alpine
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
 COPY --from=builder /app/package.json /app/package-lock.json* /app/pnpm-lock.yaml* /app/yarn.lock* ./
-RUN npm install --production && npm install ts-node typescript sqlite3
+RUN bun install --production && bun add tsx typescript sqlite3
 
 COPY --from=builder /app/.next .next
 COPY --from=builder /app/public public
