@@ -4,12 +4,12 @@ import { getResponses, saveResponse } from "@/services/responses";
 import { ResponseValue } from "@/types/Response";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { redirect, RedirectType } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import './page.css'
 
 
 import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
 
 function interpolate(str: string | undefined, vars: Record<string, string | undefined>) {
   if (!str) return ''
@@ -19,6 +19,7 @@ function interpolate(str: string | undefined, vars: Record<string, string | unde
 }
 
 export default function Page_Client() {
+  const router = useRouter();
   const { data: event, isLoading: isEventLoading } = useQuery({
     queryKey: ["event-fetch"],
     queryFn: async () => {
@@ -98,14 +99,16 @@ export default function Page_Client() {
     answer(ResponseValue.NO)
   }, [answer])
 
+  useEffect(() => {
+    if(!isEventLoading && event === null) {
+        router.replace('/admin')
+    }
+  }, [isEventLoading, event, router])
+
   if(isEventLoading) {
     return (
       <Image unoptimized aria-busy src="/loading.gif" width={50} height={50} alt="Chargement..." />
     )
-  }
-
-  if(!isEventLoading && event === null) {
-    redirect('/admin', RedirectType.replace)
   }
 
   return (
